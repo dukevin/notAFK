@@ -36,12 +36,17 @@ namespace notAFK
             this.wheel_btn = new System.Windows.Forms.Button();
             this.land_btn = new System.Windows.Forms.Button();
             this.timer_container = new System.Windows.Forms.GroupBox();
+            this.restTimer_btn = new System.Windows.Forms.Button();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.count_label = new System.Windows.Forms.Label();
             this.sinceOpen_box = new System.Windows.Forms.GroupBox();
             this.sinceOpen_text = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.statusBar = new System.Windows.Forms.TextBox();
+            this.progressBar = new System.Windows.Forms.ProgressBar();
             this.groupBox1.SuspendLayout();
             this.timer_container.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.sinceOpen_box.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -60,6 +65,7 @@ namespace notAFK
             // 
             // pause_btn
             // 
+            this.pause_btn.Enabled = false;
             this.pause_btn.ForeColor = System.Drawing.Color.DarkOrange;
             this.pause_btn.Location = new System.Drawing.Point(6, 111);
             this.pause_btn.Name = "pause_btn";
@@ -70,6 +76,7 @@ namespace notAFK
             // 
             // rowboat_btn
             // 
+            this.rowboat_btn.Enabled = false;
             this.rowboat_btn.Location = new System.Drawing.Point(6, 82);
             this.rowboat_btn.Name = "rowboat_btn";
             this.rowboat_btn.Size = new System.Drawing.Size(87, 23);
@@ -90,6 +97,7 @@ namespace notAFK
             // 
             // land_btn
             // 
+            this.land_btn.Enabled = false;
             this.land_btn.Location = new System.Drawing.Point(7, 23);
             this.land_btn.Name = "land_btn";
             this.land_btn.Size = new System.Drawing.Size(87, 23);
@@ -100,13 +108,43 @@ namespace notAFK
             // 
             // timer_container
             // 
+            this.timer_container.Controls.Add(this.restTimer_btn);
+            this.timer_container.Controls.Add(this.groupBox2);
             this.timer_container.Controls.Add(this.sinceOpen_box);
             this.timer_container.Location = new System.Drawing.Point(119, 13);
             this.timer_container.Name = "timer_container";
-            this.timer_container.Size = new System.Drawing.Size(200, 66);
+            this.timer_container.Size = new System.Drawing.Size(105, 150);
             this.timer_container.TabIndex = 2;
             this.timer_container.TabStop = false;
             this.timer_container.Text = "Timers";
+            // 
+            // restTimer_btn
+            // 
+            this.restTimer_btn.Location = new System.Drawing.Point(7, 111);
+            this.restTimer_btn.Name = "restTimer_btn";
+            this.restTimer_btn.Size = new System.Drawing.Size(85, 23);
+            this.restTimer_btn.TabIndex = 2;
+            this.restTimer_btn.Text = "Reset timer";
+            this.restTimer_btn.UseVisualStyleBackColor = true;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.count_label);
+            this.groupBox2.Location = new System.Drawing.Point(7, 66);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(85, 37);
+            this.groupBox2.TabIndex = 1;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "1hr count";
+            // 
+            // count_label
+            // 
+            this.count_label.AutoSize = true;
+            this.count_label.Location = new System.Drawing.Point(7, 16);
+            this.count_label.Name = "count_label";
+            this.count_label.Size = new System.Drawing.Size(34, 15);
+            this.count_label.TabIndex = 0;
+            this.count_label.Text = "60:00";
             // 
             // sinceOpen_box
             // 
@@ -131,26 +169,40 @@ namespace notAFK
             // 
             this.statusBar.Cursor = System.Windows.Forms.Cursors.Default;
             this.statusBar.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.statusBar.Location = new System.Drawing.Point(0, 174);
+            this.statusBar.Location = new System.Drawing.Point(0, 201);
             this.statusBar.Multiline = true;
             this.statusBar.Name = "statusBar";
             this.statusBar.ReadOnly = true;
             this.statusBar.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.statusBar.Size = new System.Drawing.Size(392, 54);
+            this.statusBar.Size = new System.Drawing.Size(239, 54);
             this.statusBar.TabIndex = 4;
+            // 
+            // progressBar
+            // 
+            this.progressBar.Location = new System.Drawing.Point(12, 169);
+            this.progressBar.Maximum = 60;
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(212, 23);
+            this.progressBar.TabIndex = 3;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(392, 228);
+            this.ClientSize = new System.Drawing.Size(239, 255);
+            this.Controls.Add(this.progressBar);
             this.Controls.Add(this.statusBar);
             this.Controls.Add(this.timer_container);
             this.Controls.Add(this.groupBox1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "notAFK";
+            this.TopMost = true;
             this.groupBox1.ResumeLayout(false);
             this.timer_container.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.sinceOpen_box.ResumeLayout(false);
             this.sinceOpen_box.PerformLayout();
             this.ResumeLayout(false);
@@ -170,6 +222,10 @@ namespace notAFK
         private System.Windows.Forms.Button wheel_btn;
         private System.Windows.Forms.Button pause_btn;
         private System.Windows.Forms.TextBox statusBar;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Label count_label;
+        private System.Windows.Forms.Button restTimer_btn;
+        private System.Windows.Forms.ProgressBar progressBar;
     }
 }
 
