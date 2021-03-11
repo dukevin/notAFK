@@ -27,33 +27,36 @@ namespace notAFK
         }
         public bool wheelScript_start()
         {
-            Thread wheel_thread = new Thread(new ThreadStart(moveCamera));
+            Thread camera_thread = new Thread(new ThreadStart(moveCamera));
             Thread button_thread = new Thread(new ThreadStart(moveWheel));
-            wheel_thread.Start();
+            camera_thread.Start();
             button_thread.Start();
             return true;
         }
         public void moveWheel()
         {
-            List<Actions> inputs = new List<Actions>();
-            Random rand = new Random();
-            int turns = rand.Next(5, 15);
-            int turnedAt;
-            int turningDir = rand.Next(-1, 1);
-            turnedAt = turningDir;
-            for(int t = 0; t < turns; t++)
+            while (true)
             {
-                if (turningDir < 0)
-                    turningDir = rand.Next(1, fullWheel_time-turnedAt);
-                else if (turningDir >= 0)
-                    turningDir = rand.Next(fullWheel_time*-1-turnedAt,-1);
-                turnedAt += turningDir;
-                inputs.Add(getInputDirFromTime(turningDir));
-                inputs.Add(new Wait(Math.Abs(turningDir)));
+                List<Actions> inputs = new List<Actions>();
+                Random rand = new Random();
+                int turns = rand.Next(5, 15);
+                int turnedAt;
+                int turningDir = rand.Next(-1, 1);
+                turnedAt = turningDir;
+                for (int t = 0; t < turns; t++)
+                {
+                    if (turningDir < 0)
+                        turningDir = rand.Next(1, fullWheel_time - turnedAt);
+                    else if (turningDir >= 0)
+                        turningDir = rand.Next(fullWheel_time * -1 - turnedAt, -1);
+                    turnedAt += turningDir;
+                    inputs.Add(getInputDirFromTime(turningDir));
+                    inputs.Add(new Wait(Math.Abs(turningDir)));
+                }
+                inputs.Add(getInputDirFromTime(turnedAt * -1));
+                inputs.Add(new Wait(Math.Abs(turnedAt)));
+                doActions(inputs);
             }
-            inputs.Add(getInputDirFromTime(turnedAt*-1));
-            inputs.Add(new Wait(Math.Abs(turnedAt)));
-            doActions(inputs);
             //return inputs.ToArray();
         }
         public void doActions(List<Actions> inputs)
@@ -67,15 +70,16 @@ namespace notAFK
         }
         public void moveCamera()
         {
-            List<Actions> inputs = new List<Actions>();
+            Point curPos = Cursor.Position;
             Random r = new Random();
-            Point origin = new Point(screen_size.Width / 2, screen_size.Height / 2);
-            inputs.Add(new MouseMove(origin));
-            inputs.Add(new MouseMove(origin.X+r.Next(-50,50), origin.Y + r.Next(-50, 50)));
-            inputs.Add(new MouseMove(origin.X + r.Next(-50, 50), origin.Y + r.Next(-50, 50)));
-            inputs.Add(new MouseMove(origin.X + r.Next(-50, 50), origin.Y + r.Next(-50, 50)));
-            inputs.Add(new MouseMove(origin));
-            doActions(inputs);
+            List<Actions> inputs = new List<Actions>();
+            inputs.Add(new MouseMove(curPos));
+            while (true)
+            {
+                inputs.Add(new MouseMove(curPos.X + r.Next(-50, 50), curPos.Y + r.Next(-50, 50)));
+                inputs.Add(new MouseMove(curPos));
+                doActions(inputs);
+            }
         }
         public void testCamera()
         {
@@ -85,7 +89,8 @@ namespace notAFK
             Point curPos = Cursor.Position;
             Debug.WriteLine(curPos);
             inputs.Add(new MouseMove(curPos));
-            inputs.Add(new MouseMove(curPos.X + 5, curPos.Y + 5));
+            inputs.Add(new MouseMove(curPos.X + 50, curPos.Y + 50));
+            inputs.Add(new Wait(1000));
             inputs.Add(new MouseMove(curPos));
             doActions(inputs);
         }

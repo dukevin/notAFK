@@ -146,6 +146,7 @@ namespace notAFK
             { this.time = time; }
             public void doAction()
             {
+                while (MouseMove.currentJob != null) ; //wait for the mouse jobs to finish but not needed
                 Thread.Sleep(time);
                 while (pressed.Count > 0) //release all the buttons
                     new InputWrapper('_', KeyEventF.KeyUp, pressed.Dequeue()).doAction();
@@ -157,21 +158,23 @@ namespace notAFK
         }
         public class MouseMove : Actions
         {
-            private static Queue<MouseMove> MouseMoveJobs = new Queue<MouseMove>();
-            private static MouseMove currentJob;
+            public static Queue<MouseMove> MouseMoveJobs = new Queue<MouseMove>();
+            public static MouseMove currentJob = null;
             private int steps = 200;
             public bool running = false;
             public int name = 0;
+            public bool virtualCursor = true; //the virtual cursor is for applications that grab the mouse so the coords do not update
             Point dest;
             Point step;
-            public MouseMove(int dx, int dy)
+            public MouseMove(int dx, int dy, bool vCursor = true)
             {
                 MouseMoveJobs.Enqueue(this);
                 name = MouseMoveJobs.Count;
                 dest.X = dx;
                 dest.Y = dy;
+                virtualCursor = vCursor;
             }
-            public MouseMove(Point dp) : this(dp.X, dp.Y) { }
+            public MouseMove(Point dp, bool vCursor = false) : this(dp.X, dp.Y, vCursor) { }
             public void doAction()
             {
                 Point curpos = Cursor.Position;
@@ -187,9 +190,13 @@ namespace notAFK
                 Point before = step;
                 for (int i = 0; i < 1400; i++) //1400 iterations is a failsafe
                 {
-                    curpos = Cursor.Position;
+                    if(!virtualCursor)
+                        curpos = Cursor.Position;
                     if (dest.Equals(curpos))
+                    {
+                        Debug.WriteLine("Cursor " + name + " destination and curpos are equal.. skipping");
                         break;
+                    }
                     if (step.X == 0 && !dest.X.Equals(curpos.X)) //not moving and not at dest
                         step.X = curpos.X > dest.X ? -1 : 1;
                     else if (step.Y == 0 && !dest.Y.Equals(curpos.Y)) //not moving and not at dest
@@ -202,17 +209,23 @@ namespace notAFK
                         step.X = dest.X - curpos.X;
                     else if (step.Y > 0 && curpos.Y + step.Y > dest.Y)
                         step.Y = dest.Y - curpos.Y;
+                    if (virtualCursor)
+                    {
+                        curpos.X += step.X;
+                        curpos.Y += step.Y;
+                    }
                     SendMouseInput(new MouseInput[] { mouseFactory(step.X, step.Y) });
                     Debug.WriteLine("-- Cursor "+name+" @"+ curpos + " moving by "+step+" adjusted from "+before+" going to "+dest);
                     Thread.Sleep(1);
                 }
                 //Debug.WriteLine("Done job " + name);
                 currentJob = null;
-                MouseMoveJobs.Dequeue();
+                if(MouseMoveJobs.Count > 0)
+                    MouseMoveJobs.Dequeue();
             }
             public override string ToString()
             {
-                return "Moving to " + dest.X + ", " + dest.Y;
+                return "Moving "+name+" to " + dest.X + ", " + dest.Y;
             }
         }
         public class InputWrapper : Actions

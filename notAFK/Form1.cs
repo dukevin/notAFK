@@ -17,14 +17,14 @@ namespace notAFK
     public partial class Form1 : Form
     {
         Rectangle dimentions;
-
+        private System.Windows.Forms.Timer timerSinceOpen;
+        private int counter;
         public Form1()
         {
             InitializeComponent();
             Cursor cursor = new Cursor(Cursor.Current.Handle);
-            dimentions = Screen.FromControl(this).Bounds;
+            dimentions = Screen.FromControl(this).Bounds
         }
-
         private void random_btn_Click(object sender, EventArgs e)
         {
             updateStatusLabel("Button pressed - Land Actions");
