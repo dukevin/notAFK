@@ -153,7 +153,38 @@ namespace notAFK
             }
             public override string ToString()
             {
-                return "Waiting "+time+"ms";
+                return "Waiting "+time/1000+" seconds...";
+            }
+        }
+
+        public class MouseMoveByTime : Actions
+        {
+            public static Queue<MouseMove> MouseMoveJobs = new Queue<MouseMove>();
+            public static MouseMove currentJob = null;
+            public bool running = false;
+            public Point velocity;
+            public int time;
+
+            public MouseMoveByTime(Point velocity, int time)
+            {
+                this.velocity = velocity;
+                this.time = time;
+            }
+
+            public void doAction()
+            {
+                var timer = new Stopwatch();
+                timer.Start();
+                TimeSpan timeTaken = timer.Elapsed;
+                while (timeTaken.TotalMilliseconds < time) {
+                    timeTaken = timer.Elapsed;
+                    SendMouseInput(new MouseInput[] { mouseFactory(velocity.X, velocity.Y) });
+                    Thread.Sleep(1);
+                }
+            }
+            public override string ToString()
+            {
+                return "Camera move for " + time/1000 + "s in direction "+velocity.X+", "+velocity.Y;
             }
         }
         public class MouseMove : Actions
@@ -175,6 +206,7 @@ namespace notAFK
                 virtualCursor = vCursor;
             }
             public MouseMove(Point dp, bool vCursor = false) : this(dp.X, dp.Y, vCursor) { }
+
             public void doAction()
             {
                 Point curpos = Cursor.Position;
@@ -215,7 +247,7 @@ namespace notAFK
                         curpos.Y += step.Y;
                     }
                     SendMouseInput(new MouseInput[] { mouseFactory(step.X, step.Y) });
-                    Debug.WriteLine("-- Cursor "+name+" @"+ curpos + " moving by "+step+" adjusted from "+before+" going to "+dest);
+                    //Debug.WriteLine("-- Cursor "+name+" @"+ curpos + " moving by "+step+" adjusted from "+before+" going to "+dest);
                     Thread.Sleep(1);
                 }
                 //Debug.WriteLine("Done job " + name);
@@ -225,7 +257,7 @@ namespace notAFK
             }
             public override string ToString()
             {
-                return "Moving "+name+" to " + dest.X + ", " + dest.Y;
+                return "Camera move to " + dest.X + ", " + dest.Y;
             }
         }
         public class InputWrapper : Actions
@@ -255,7 +287,7 @@ namespace notAFK
                     button = _input[0].u.ki.wScan;
                 else
                     button = letter;
-                return "Pressing " + button + "";
+                return "Pressing [" + char.ToUpper(button) + "]";
             }
         }
 

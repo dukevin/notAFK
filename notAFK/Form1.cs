@@ -21,6 +21,7 @@ namespace notAFK
         private CountDownTimer timerDown = new CountDownTimer();
         CountDownTimer timerUp = new CountDownTimer();
         public delegate void SetProgressDelg(int level);
+        private movement_scripts curScript;
         public Form1()
         {
             InitializeComponent();
@@ -28,42 +29,45 @@ namespace notAFK
             dimentions = Screen.FromControl(this).Bounds;
             timerUp.SetTime(360, 0);
             timerUp.Start();
-            timerUp.TimeChanged += () => sinceOpen_text.Text = timerUp._stpWatch.Elapsed.Minutes.ToString()+":"+timerUp._stpWatch.Elapsed.Seconds.ToString();
+            timerUp.TimeChanged += () => sinceOpen_text.Text = timerUp._stpWatch.Elapsed.Minutes.ToString("D2")+":"+timerUp._stpWatch.Elapsed.Seconds.ToString("D2");
         }
         private void random_btn_Click(object sender, EventArgs e)
         {
             updateStatusLabel("Button pressed - Land Actions");
+            start_countDownTimer();
             Thread.Sleep(2000);
-            movement_scripts scripts = new movement_scripts(dimentions, this);
-            scripts.testCamera();
-            updateStatusLabel("Finished Land Actions");
+            curScript = new movement_scripts(dimentions, this);
+            curScript.testCamera();
         }
         public void updateStatusLabel(string text)
         {
             if (text == "null")
                 return;
-            statusBar.AppendText(Environment.NewLine+text);
-            Application.DoEvents();
+            Invoke(new Action(() =>
+            {
+                statusBar.AppendText(Environment.NewLine + text);
+            }));
+            //Application.DoEvents();
         }
 
         private void sloop_btn_Click(object sender, EventArgs e) //ClickKey(0x11);
         {
             updateStatusLabel("Button pressed - Wheel");
             start_countDownTimer();
-            movement_scripts scripts = new movement_scripts(dimentions, this);
+            curScript = new movement_scripts(dimentions, this);
             Thread.Sleep(2000);
-            //scripts.wheelScript_start();
-            //scripts.moveWheel();
-            updateStatusLabel("Finished Wheel actions");
+            curScript.wheelScript_start();
         }
         private void start_countDownTimer()
         {
+            pause_btn.Enabled = true;
             timerDown.SetTime(60, 0);
             timerDown.Start();
             timerDown.TimeChanged += () => count_label.Text = timerDown.TimeLeftStr;
             timerDown.TimeChanged += () => progressBar.Value = 60-(int)timerDown.TimeLeft.TotalMinutes;
-            timerDown.CountDownFinished += () => updateStatusLabel("The 1 hour timer is up!");
+            timerDown.CountDownFinished += () => updateStatusLabel("== 1 hour has elapsed ==");
             timerDown.CountDownFinished += () => progressBar.SetState(2);
+            timerDown.CountDownFinished += () => stop_scripts_checked();
             Debug.WriteLine(progressBar.Value);
         }
         private void doActions(Actions[] actions)
@@ -78,6 +82,7 @@ namespace notAFK
         private void rowboat_btn_Click(object sender, EventArgs e)
         {  
             updateStatusLabel("Button pressed - Rowboat");
+            start_countDownTimer();
             Thread.Sleep(2000);
             Random rand = new Random();
             Actions[] inputs = {
@@ -92,7 +97,19 @@ namespace notAFK
                 new InputWrapper('f', KeyEventF.KeyUp),
             };
             doActions(inputs);
-            updateStatusLabel("Finished sloop actions");
+        }
+        private void pause_btn_Click(object sender, EventArgs e)
+        {
+            updateStatusLabel("Stopped");
+            curScript.clean();
+            curScript.running = false;
+            pause_btn.Enabled = false;
+        }
+        private void stop_scripts_checked()
+        {
+            if (!checkBox1.Checked)
+                return;
+            pause_btn_Click(null, null);
         }
     }
     public static class ModifyProgressBarColor

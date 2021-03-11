@@ -19,11 +19,14 @@ namespace notAFK
     {
         public readonly int fullWheel_time = 2500;
         public static Rectangle screen_size;
-        Form1 form;
+        public bool running = true;
+        public Form1 form;
         public movement_scripts(Rectangle dimentions, Form1 form)
         {
             screen_size = dimentions;
             this.form = form;
+            running = true;
+            form.updateStatusLabel("Starting movement...");
         }
         public bool wheelScript_start()
         {
@@ -35,7 +38,7 @@ namespace notAFK
         }
         public void moveWheel()
         {
-            while (true)
+            while (running)
             {
                 List<Actions> inputs = new List<Actions>();
                 Random rand = new Random();
@@ -63,10 +66,17 @@ namespace notAFK
         {
             foreach (Actions a in inputs)
             {
-                //form.updateStatusLabel(a.ToString());
+                if (!running) break;
+                form.updateStatusLabel(a.ToString());
                 Debug.WriteLine(a.ToString());
                 a.doAction();
             }
+        }
+        public void clean()
+        {
+            MouseMove.MouseMoveJobs.Clear();
+            MouseMove.currentJob = null;
+            running = false;
         }
         public void moveCamera()
         {
@@ -74,9 +84,10 @@ namespace notAFK
             Random r = new Random();
             List<Actions> inputs = new List<Actions>();
             inputs.Add(new MouseMove(curPos));
-            while (true)
+            while (running)
             {
                 inputs.Add(new MouseMove(curPos.X + r.Next(-50, 50), curPos.Y + r.Next(-50, 50)));
+                inputs.Add(new Wait(1000));
                 inputs.Add(new MouseMove(curPos));
                 doActions(inputs);
             }
@@ -84,15 +95,17 @@ namespace notAFK
         public void testCamera()
         {
             List<Actions> inputs = new List<Actions>();
-            Random r = new Random();
-            Point origin = new Point(screen_size.Width / 2, screen_size.Height / 2);
-            Point curPos = Cursor.Position;
-            Debug.WriteLine(curPos);
-            inputs.Add(new MouseMove(curPos));
-            inputs.Add(new MouseMove(curPos.X + 50, curPos.Y + 50));
-            inputs.Add(new Wait(1000));
-            inputs.Add(new MouseMove(curPos));
-            doActions(inputs);
+            while (running)
+            {
+                inputs.Add(new MouseMoveByTime(new Point(1, 0), 1000));
+                inputs.Add(new Wait(1000));
+                inputs.Add(new MouseMoveByTime(new Point(-1, 0), 1000));
+                inputs.Add(new Wait(1000));
+                inputs.Add(new MouseMoveByTime(new Point(-1, 0), 1000));
+                inputs.Add(new Wait(1000));
+                inputs.Add(new MouseMoveByTime(new Point(1, 0), 1000));
+                doActions(inputs);
+            }
         }
         private InputWrapper getInputDirFromTime(int time)
         {
