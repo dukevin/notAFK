@@ -99,6 +99,7 @@ namespace notAFK
             // 
             // land_btn
             // 
+            this.land_btn.Enabled = false;
             this.land_btn.Location = new System.Drawing.Point(7, 53);
             this.land_btn.Name = "land_btn";
             this.land_btn.Size = new System.Drawing.Size(87, 23);

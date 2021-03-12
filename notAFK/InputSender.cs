@@ -141,22 +141,32 @@ namespace notAFK
         }
         public class Wait : Actions
         {
-            private int time;
-            public Wait(int time)
-            { this.time = time; }
-            public void doAction()
+            protected int time;
+            public Wait(int time) => this.time = time;
+            public virtual void doAction()
             {
-                while (MouseMoveAbs.currentJob != null) ; //wait for the mouse jobs to finish but not needed
+                Thread.Sleep(time);
+            }
+            public override string ToString()
+            {
+                return "Waiting "+ Math.Round((double)time / 1000, 2)+" seconds...";
+            }
+        }
+        /* presses key for a determined amount */
+        public class KeyWait : Wait
+        {
+            public KeyWait(int time) : base(time) => this.time = time;
+            public override void doAction()
+            {
                 Thread.Sleep(time);
                 while (pressed.Count > 0) //release all the buttons
                     new InputWrapper('_', KeyEventF.KeyUp, pressed.Dequeue()).doAction();
             }
             public override string ToString()
             {
-                return "Waiting "+time/1000+" seconds...";
+                return "Pressing for " + Math.Round((double)time / 1000,2) + " seconds...";
             }
         }
-
         public class MouseMoveByTime : Actions
         {
             public static Queue<MouseMoveAbs> MouseMoveJobs = new Queue<MouseMoveAbs>();
@@ -324,7 +334,7 @@ namespace notAFK
             }
             public override string ToString()
             {
-                return "Move camera by " + dest.X + ", " + dest.Y+ " with velocity " + step.X + "," + step.Y;
+                return "Move camera by (" + dest.X + ", " + dest.Y+ ") +<" + step.X + "," + step.Y+">";
             }
         }
         public class InputWrapper : Actions

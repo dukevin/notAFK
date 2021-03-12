@@ -30,9 +30,9 @@ namespace notAFK
         }
         public bool wheelScript_start()
         {
-            //Thread camera_thread = new Thread(new ThreadStart(moveCamera));
+            Thread camera_thread = new Thread(new ThreadStart(moveCamera));
             Thread button_thread = new Thread(new ThreadStart(moveWheel));
-            //camera_thread.Start();
+            camera_thread.Start();
             button_thread.Start();
             return true;
         }
@@ -54,10 +54,10 @@ namespace notAFK
                         turningDir = rand.Next(fullWheel_time * -1 - turnedAt, -1);
                     turnedAt += turningDir;
                     inputs.Add(getInputDirFromTime(turningDir));
-                    inputs.Add(new Wait(Math.Abs(turningDir)));
+                    inputs.Add(new KeyWait(Math.Abs(turningDir)));
                 }
                 inputs.Add(getInputDirFromTime(turnedAt * -1));
-                inputs.Add(new Wait(Math.Abs(turnedAt)));
+                inputs.Add(new KeyWait(Math.Abs(turnedAt)));
                 doActions(inputs);
             }
         }
@@ -88,11 +88,21 @@ namespace notAFK
             List<Actions> inputs = new List<Actions>();
             while (running)
             {
-                int rx = r.Next(-500, 500);
-                int ry = r.Next(-500, 500);
+                r = new Random();
+                int rx = r.Next(-300, 300);
+                int ry = r.Next(-200, 200);
+                int rx2 = 0;
+                int ry2 = 0;
                 inputs.Add(new MouseMove(rx, ry));
-                inputs.Add(new MouseMove(-rx, -ry));
-                inputs.Add(new Wait(1000));
+                inputs.Add(new Wait(r.Next(0, 3000)));
+                if (r.Next(1, 3) == 2)
+                {
+                    rx2 = r.Next(-200, 200);
+                    ry2 = r.Next(-200, 50);
+                    inputs.Add(new MouseMove(rx2, ry2));
+                }
+                inputs.Add(new MouseMove(-(rx+rx2), -(ry+ry2)));
+                inputs.Add(new Wait(r.Next(0, 3000)));
                 doActions(inputs);
             }
         }
