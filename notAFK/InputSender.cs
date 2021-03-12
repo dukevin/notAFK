@@ -146,7 +146,7 @@ namespace notAFK
             { this.time = time; }
             public void doAction()
             {
-                while (MouseMove.currentJob != null) ; //wait for the mouse jobs to finish but not needed
+                while (MouseMoveAbs.currentJob != null) ; //wait for the mouse jobs to finish but not needed
                 Thread.Sleep(time);
                 while (pressed.Count > 0) //release all the buttons
                     new InputWrapper('_', KeyEventF.KeyUp, pressed.Dequeue()).doAction();
@@ -159,8 +159,8 @@ namespace notAFK
 
         public class MouseMoveByTime : Actions
         {
-            public static Queue<MouseMove> MouseMoveJobs = new Queue<MouseMove>();
-            public static MouseMove currentJob = null;
+            public static Queue<MouseMoveAbs> MouseMoveJobs = new Queue<MouseMoveAbs>();
+            public static MouseMoveAbs currentJob = null;
             public bool running = false;
             public Point velocity;
             public int time;
@@ -187,25 +187,29 @@ namespace notAFK
                 return "Camera move for " + time/1000 + "s in direction "+velocity.X+", "+velocity.Y;
             }
         }
-        public class MouseMove : Actions
+        /*** MouseMove is used for absolute mouse movements that want to go to a specific coordinate.
+         *   As input it takes an absolute coordinate.
+         *   It needs to be able to read its own position at least once, which can cause problems if
+             the application grabs the mouse */
+        public class MouseMoveAbs : Actions
         {
-            public static Queue<MouseMove> MouseMoveJobs = new Queue<MouseMove>();
-            public static MouseMove currentJob = null;
+            public static Queue<MouseMoveAbs> MouseMoveJobs = new Queue<MouseMoveAbs>();
+            public static MouseMoveAbs currentJob = null;
             private int steps = 200;
             public bool running = false;
             public int name = 0;
-            public bool virtualCursor = true; //the virtual cursor is for applications that grab the mouse so the coords do not update
+            public bool isVirtual = true; //the virtual cursor is for applications that grab the mouse so the coords do not update
             Point dest;
             Point step;
-            public MouseMove(int dx, int dy, bool vCursor = true)
+            public MouseMoveAbs(int dx, int dy, bool vCursor = true)
             {
                 MouseMoveJobs.Enqueue(this);
                 name = MouseMoveJobs.Count;
                 dest.X = dx;
                 dest.Y = dy;
-                virtualCursor = vCursor;
+                isVirtual = vCursor;
             }
-            public MouseMove(Point dp, bool vCursor = false) : this(dp.X, dp.Y, vCursor) { }
+            public MouseMoveAbs(Point dp, bool vCursor = false) : this(dp.X, dp.Y, vCursor) { }
 
             public void doAction()
             {
@@ -218,11 +222,10 @@ namespace notAFK
                     currentJob.running = true;
                 }
                 while (currentJob.running && currentJob != this) ; //wait
-                //Debug.WriteLine("Starting job " + name);
                 Point before = step;
                 for (int i = 0; i < 1400; i++) //1400 iterations is a failsafe
                 {
-                    if(!virtualCursor)
+                    if(!isVirtual)
                         curpos = Cursor.Position;
                     if (dest.Equals(curpos))
                     {
@@ -241,16 +244,14 @@ namespace notAFK
                         step.X = dest.X - curpos.X;
                     else if (step.Y > 0 && curpos.Y + step.Y > dest.Y)
                         step.Y = dest.Y - curpos.Y;
-                    if (virtualCursor)
+                    if (isVirtual)
                     {
                         curpos.X += step.X;
                         curpos.Y += step.Y;
                     }
                     SendMouseInput(new MouseInput[] { mouseFactory(step.X, step.Y) });
-                    //Debug.WriteLine("-- Cursor "+name+" @"+ curpos + " moving by "+step+" adjusted from "+before+" going to "+dest);
                     Thread.Sleep(1);
                 }
-                //Debug.WriteLine("Done job " + name);
                 currentJob = null;
                 if(MouseMoveJobs.Count > 0)
                     MouseMoveJobs.Dequeue();
@@ -258,6 +259,72 @@ namespace notAFK
             public override string ToString()
             {
                 return "Camera move to " + dest.X + ", " + dest.Y;
+            }
+        }
+        /*** MouseMove is used for relative mouse movements not based on prev positions. Useful when a program grabs the cursor and 
+           * mouse position cannot be used. As input it takes relative coordinates which get added to current */
+        public class MouseMove : Actions
+        {
+            public static Queue<MouseMove> MouseMoveJobs = new Queue<MouseMove>();
+            public static MouseMove currentJob = null;
+            public Point dest;
+            private int steps = 200;
+            public bool running = false;
+            public Queue<MouseInput[]> path;
+            public Point curpos;
+            public Point step;
+            public MouseMove(int dx, int dy)
+            {
+                MouseMoveJobs.Enqueue(this);
+                dest = new Point(dx, dy);
+                path = new Queue<MouseInput[]>();
+            }
+            public MouseMove(Point dp) : this(dp.X, dp.Y) { }
+            public void doAction()
+            {
+                if (currentJob == null)
+                {
+                    currentJob = this;
+                    currentJob.running = true;
+                }
+                while (currentJob.running && currentJob != this) ; //wait
+                curpos = new Point(0, 0);
+                PointF slope = new PointF(dest.X, dest.Y);
+                step = new Point((int)slope.X / steps, (int)slope.Y / steps);
+                for (int i=0; i < 1400; i++)
+                {
+                    if (dest.Equals(curpos))
+                        break;
+                    if (step.X == 0 && !dest.X.Equals(curpos.X)) //not moving and not at dest
+                        step.X = curpos.X > dest.X ? -1 : 1;
+                    else if (step.Y == 0 && !dest.Y.Equals(curpos.Y)) //not moving and not at dest
+                        step.Y = curpos.Y > dest.Y ? -1 : 1;
+                    else if (step.X < 0 && curpos.X + step.X < dest.X) //if we're going backwards but we're about to pass dest
+                        step.X = dest.X - curpos.X;
+                    else if (step.Y < 0 && curpos.Y + step.Y < dest.Y)
+                        step.Y = dest.Y - curpos.Y;
+                    else if (step.X > 0 && curpos.X + step.X > dest.X) //if we're going forward but we're about to pass our dest
+                        step.X = dest.X - curpos.X;
+                    else if (step.Y > 0 && curpos.Y + step.Y > dest.Y)
+                        step.Y = dest.Y - curpos.Y;
+                    curpos.X += step.X; //update the virtual position
+                    curpos.Y += step.Y;
+                    path.Enqueue(new MouseInput[] { mouseFactory(step.X, step.Y) });
+                }
+                while(path.Count > 0 && running)
+                {
+                    MouseInput[] p = path.Dequeue();
+                    SendMouseInput(p);
+                    //Debug.WriteLine("> Move camera by " + step.X + ", " + step.Y + " to " + dest.X + ", " + dest.Y);
+                    Thread.Sleep(1);
+                }
+                currentJob = null;
+                if (MouseMoveJobs.Count > 0)
+                    MouseMoveJobs.Dequeue();
+            }
+            public override string ToString()
+            {
+                return "Move camera by " + dest.X + ", " + dest.Y+ " with velocity " + step.X + "," + step.Y;
             }
         }
         public class InputWrapper : Actions

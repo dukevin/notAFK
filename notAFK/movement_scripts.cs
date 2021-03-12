@@ -30,9 +30,9 @@ namespace notAFK
         }
         public bool wheelScript_start()
         {
-            Thread camera_thread = new Thread(new ThreadStart(moveCamera));
+            //Thread camera_thread = new Thread(new ThreadStart(moveCamera));
             Thread button_thread = new Thread(new ThreadStart(moveWheel));
-            camera_thread.Start();
+            //camera_thread.Start();
             button_thread.Start();
             return true;
         }
@@ -60,7 +60,6 @@ namespace notAFK
                 inputs.Add(new Wait(Math.Abs(turnedAt)));
                 doActions(inputs);
             }
-            //return inputs.ToArray();
         }
         public void doActions(List<Actions> inputs)
         {
@@ -74,8 +73,12 @@ namespace notAFK
         }
         public void clean()
         {
+            MouseMoveAbs.MouseMoveJobs.Clear();
+            MouseMoveAbs.currentJob = null;
             MouseMove.MouseMoveJobs.Clear();
             MouseMove.currentJob = null;
+            MouseMoveByTime.MouseMoveJobs.Clear();
+            MouseMoveByTime.currentJob = null;
             running = false;
         }
         public void moveCamera()
@@ -83,12 +86,13 @@ namespace notAFK
             Point curPos = Cursor.Position;
             Random r = new Random();
             List<Actions> inputs = new List<Actions>();
-            inputs.Add(new MouseMove(curPos));
             while (running)
             {
-                inputs.Add(new MouseMove(curPos.X + r.Next(-50, 50), curPos.Y + r.Next(-50, 50)));
+                int rx = r.Next(-500, 500);
+                int ry = r.Next(-500, 500);
+                inputs.Add(new MouseMove(rx, ry));
+                inputs.Add(new MouseMove(-rx, -ry));
                 inputs.Add(new Wait(1000));
-                inputs.Add(new MouseMove(curPos));
                 doActions(inputs);
             }
         }

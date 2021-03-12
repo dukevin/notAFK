@@ -92,7 +92,7 @@ namespace notAFK
             this.wheel_btn.Location = new System.Drawing.Point(7, 22);
             this.wheel_btn.Name = "wheel_btn";
             this.wheel_btn.Size = new System.Drawing.Size(87, 23);
-            this.wheel_btn.TabIndex = 1;
+            this.wheel_btn.TabIndex = 0;
             this.wheel_btn.Text = "Ship wheel";
             this.wheel_btn.UseVisualStyleBackColor = true;
             this.wheel_btn.Click += new System.EventHandler(this.sloop_btn_Click);
@@ -102,7 +102,7 @@ namespace notAFK
             this.land_btn.Location = new System.Drawing.Point(7, 53);
             this.land_btn.Name = "land_btn";
             this.land_btn.Size = new System.Drawing.Size(87, 23);
-            this.land_btn.TabIndex = 0;
+            this.land_btn.TabIndex = 1;
             this.land_btn.Text = "Land actions";
             this.land_btn.UseVisualStyleBackColor = true;
             this.land_btn.Click += new System.EventHandler(this.random_btn_Click);
