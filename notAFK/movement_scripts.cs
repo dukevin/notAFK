@@ -26,7 +26,7 @@ namespace notAFK
             screen_size = dimentions;
             this.form = form;
             running = true;
-            form.updateStatusLabel("Starting movement...");
+            //form.updateStatusLabel("Starting movement...");
         }
         public bool wheelScript_start()
         {
@@ -34,6 +34,12 @@ namespace notAFK
             Thread button_thread = new Thread(new ThreadStart(moveWheel));
             camera_thread.Start();
             button_thread.Start();
+            return true;
+        }
+        public bool rowboatScript_start()
+        {
+            Thread row_thread = new Thread(new ThreadStart(rowBoatForward));
+            row_thread.Start();
             return true;
         }
         public void moveWheel()
@@ -103,6 +109,18 @@ namespace notAFK
                 }
                 inputs.Add(new MouseMove(-(rx+rx2), -(ry+ry2)));
                 inputs.Add(new Wait(r.Next(0, 3000)));
+                doActions(inputs);
+            }
+        }
+        public void rowBoatForward()
+        {
+            while(running)
+            {
+                List<Actions> inputs = new List<Actions>();
+                inputs.Add(new InputWrapper('a'));
+                inputs.Add(new KeyWait(2000));
+                inputs.Add(new InputWrapper('d'));
+                inputs.Add(new KeyWait(2000));
                 doActions(inputs);
             }
         }

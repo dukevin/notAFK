@@ -78,11 +78,10 @@ namespace notAFK
             // 
             // rowboat_btn
             // 
-            this.rowboat_btn.Enabled = false;
-            this.rowboat_btn.Location = new System.Drawing.Point(6, 82);
+            this.rowboat_btn.Location = new System.Drawing.Point(6, 53);
             this.rowboat_btn.Name = "rowboat_btn";
             this.rowboat_btn.Size = new System.Drawing.Size(87, 23);
-            this.rowboat_btn.TabIndex = 2;
+            this.rowboat_btn.TabIndex = 1;
             this.rowboat_btn.Text = "Row forward";
             this.rowboat_btn.UseVisualStyleBackColor = true;
             this.rowboat_btn.Click += new System.EventHandler(this.rowboat_btn_Click);
@@ -100,10 +99,10 @@ namespace notAFK
             // land_btn
             // 
             this.land_btn.Enabled = false;
-            this.land_btn.Location = new System.Drawing.Point(7, 53);
+            this.land_btn.Location = new System.Drawing.Point(6, 82);
             this.land_btn.Name = "land_btn";
             this.land_btn.Size = new System.Drawing.Size(87, 23);
-            this.land_btn.TabIndex = 1;
+            this.land_btn.TabIndex = 3;
             this.land_btn.Text = "Land actions";
             this.land_btn.UseVisualStyleBackColor = true;
             this.land_btn.Click += new System.EventHandler(this.random_btn_Click);

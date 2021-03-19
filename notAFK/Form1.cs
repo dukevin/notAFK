@@ -53,6 +53,7 @@ namespace notAFK
         private void sloop_btn_Click(object sender, EventArgs e) //ClickKey(0x11);
         {
             updateStatusLabel("Button pressed - Wheel");
+            updateStatusLabel("Pressing: [A] [D] with mouse movement");
             start_countDownTimer();
             curScript = new movement_scripts(dimentions, this);
             Thread.Sleep(2000);
@@ -80,23 +81,13 @@ namespace notAFK
         }
 
         private void rowboat_btn_Click(object sender, EventArgs e)
-        {  
+        {
             updateStatusLabel("Button pressed - Rowboat");
+            updateStatusLabel("Pressing: [A] [D] with 2 sec delays");
             start_countDownTimer();
+            curScript = new movement_scripts(dimentions, this);
             Thread.Sleep(2000);
-            Random rand = new Random();
-            Actions[] inputs = {
-                new InputWrapper('a', KeyEventF.KeyDown),
-                new Wait(2500),
-                new InputWrapper('a', KeyEventF.KeyUp),
-                new InputWrapper('d', KeyEventF.KeyDown),
-                new Wait(2500),
-                new InputWrapper('d', KeyEventF.KeyUp),
-                new InputWrapper('f', KeyEventF.KeyDown),
-                new Wait(2500),
-                new InputWrapper('f', KeyEventF.KeyUp),
-            };
-            doActions(inputs);
+            curScript.rowboatScript_start();
         }
         private void pause_btn_Click(object sender, EventArgs e)
         {
@@ -123,3 +114,24 @@ namespace notAFK
     }
 }
 //https://www.codeproject.com/Articles/5264831/How-to-Send-Inputs-using-Csharp
+/*
+ *      private void rowboat_btn_Click(object sender, EventArgs e)
+        {  
+            updateStatusLabel("Button pressed - Rowboat");
+            start_countDownTimer();
+            Thread.Sleep(2000);
+            Random rand = new Random();
+            Actions[] inputs = {
+                new InputWrapper('a', KeyEventF.KeyDown),
+                new Wait(2500),
+                new InputWrapper('a', KeyEventF.KeyUp),
+                new InputWrapper('d', KeyEventF.KeyDown),
+                new Wait(2500),
+                new InputWrapper('d', KeyEventF.KeyUp),
+                new InputWrapper('f', KeyEventF.KeyDown),
+                new Wait(2500),
+                new InputWrapper('f', KeyEventF.KeyUp),
+            };
+            doActions(inputs);
+        }
+*/
