@@ -17,11 +17,12 @@ namespace notAFK
 {
     public partial class Form1 : Form
     {
+        public readonly int VERSION = 1;
         Rectangle dimentions;
         private CountDownTimer timerDown = new CountDownTimer();
         CountDownTimer timerUp = new CountDownTimer();
         public delegate void SetProgressDelg(int level);
-        private movement_scripts curScript;
+        private movement_scripts curScript = null;
         public Form1()
         {
             InitializeComponent();
@@ -30,14 +31,16 @@ namespace notAFK
             timerUp.SetTime(360, 0);
             timerUp.Start();
             timerUp.TimeChanged += () => sinceOpen_text.Text = timerUp._stpWatch.Elapsed.Minutes.ToString("D2")+":"+timerUp._stpWatch.Elapsed.Seconds.ToString("D2");
+            updateStatusLabel("Welcome!  Version "+ VERSION);
         }
-        private void random_btn_Click(object sender, EventArgs e)
+        private void land_btn_Click(object sender, EventArgs e)
         {
-            updateStatusLabel("Button pressed - Land Actions");
+            land_btn.Enabled = false;
+            updateStatusLabel("Button pressed - Circular movement");
             start_countDownTimer();
-            Thread.Sleep(2000);
             curScript = new movement_scripts(dimentions, this);
-            curScript.testCamera();
+            Thread.Sleep(2000);
+            curScript.landActionsScript_start();
         }
         public void updateStatusLabel(string text)
         {
@@ -50,10 +53,10 @@ namespace notAFK
             //Application.DoEvents();
         }
 
-        private void sloop_btn_Click(object sender, EventArgs e) //ClickKey(0x11);
+        private void ship_btn_Click(object sender, EventArgs e) //ClickKey(0x11);
         {
             updateStatusLabel("Button pressed - Wheel");
-            updateStatusLabel("Pressing: [A] [D] with mouse movement");
+            updateStatusLabel("Pressing: [A] [D] moving mouse");
             start_countDownTimer();
             curScript = new movement_scripts(dimentions, this);
             Thread.Sleep(2000);
@@ -61,7 +64,8 @@ namespace notAFK
         }
         private void start_countDownTimer()
         {
-            pause_btn.Enabled = true;
+            progressBar.SetState(1);
+            endisableButtons(false,pause_btn);
             timerDown.SetTime(60, 0);
             timerDown.Start();
             timerDown.TimeChanged += () => count_label.Text = timerDown.TimeLeftStr;
@@ -79,7 +83,20 @@ namespace notAFK
                 a.doAction();
             }
         }
-
+        private void endisableButtons(bool endis, Button except = null)
+        {
+            wheel_btn.Enabled = endis;
+            rowboat_btn.Enabled = endis;
+            land_btn.Enabled = endis;
+            if (except != null)
+            {
+                if(!endis)
+                    except.Enabled = true;
+                else
+                    except.Enabled = false;
+            }
+                
+        }
         private void rowboat_btn_Click(object sender, EventArgs e)
         {
             updateStatusLabel("Button pressed - Rowboat");
@@ -91,10 +108,14 @@ namespace notAFK
         }
         private void pause_btn_Click(object sender, EventArgs e)
         {
-            updateStatusLabel("Stopped");
+            updateStatusLabel("Stopping...");
+            endisableButtons(true, pause_btn);
             curScript.clean();
             curScript.running = false;
             pause_btn.Enabled = false;
+            curScript = null;
+            progressBar.SetState(3);
+            updateStatusLabel("Stopped");
         }
         private void stop_scripts_checked()
         {

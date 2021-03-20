@@ -4,6 +4,10 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>ships_wheel.ico</ApplicationIcon>
+    <Authors>Kevin Duke</Authors>
+    <Description>Macro loader for sea of thieves</Description>
+    <Copyright>Public Domain</Copyright>
   </PropertyGroup>
 
 </Project>

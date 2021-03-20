@@ -30,6 +30,7 @@ namespace notAFK
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.pause_btn = new System.Windows.Forms.Button();
             this.rowboat_btn = new System.Windows.Forms.Button();
@@ -94,18 +95,17 @@ namespace notAFK
             this.wheel_btn.TabIndex = 0;
             this.wheel_btn.Text = "Ship wheel";
             this.wheel_btn.UseVisualStyleBackColor = true;
-            this.wheel_btn.Click += new System.EventHandler(this.sloop_btn_Click);
+            this.wheel_btn.Click += new System.EventHandler(this.ship_btn_Click);
             // 
             // land_btn
             // 
-            this.land_btn.Enabled = false;
             this.land_btn.Location = new System.Drawing.Point(6, 82);
             this.land_btn.Name = "land_btn";
             this.land_btn.Size = new System.Drawing.Size(87, 23);
             this.land_btn.TabIndex = 3;
-            this.land_btn.Text = "Land actions";
+            this.land_btn.Text = "Circular movement";
             this.land_btn.UseVisualStyleBackColor = true;
-            this.land_btn.Click += new System.EventHandler(this.random_btn_Click);
+            this.land_btn.Click += new System.EventHandler(this.land_btn_Click);
             // 
             // timer_container
             // 
@@ -199,6 +199,7 @@ namespace notAFK
             this.Controls.Add(this.timer_container);
             this.Controls.Add(this.groupBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "notAFK";

@@ -39,7 +39,17 @@ namespace notAFK
         public bool rowboatScript_start()
         {
             Thread row_thread = new Thread(new ThreadStart(rowBoatForward));
+            Thread camera_thread = new Thread(new ThreadStart(moveCameraSlightly));
             row_thread.Start();
+            camera_thread.Start();
+            return true;
+        }
+        public bool landActionsScript_start()
+        {
+            Thread row_thread = new Thread(new ThreadStart(moveInSquare));
+            Thread camera_thread = new Thread(new ThreadStart(moveCameraSquare));
+            row_thread.Start();
+            camera_thread.Start();
             return true;
         }
         public void moveWheel()
@@ -109,6 +119,56 @@ namespace notAFK
                 }
                 inputs.Add(new MouseMove(-(rx+rx2), -(ry+ry2)));
                 inputs.Add(new Wait(r.Next(0, 3000)));
+                doActions(inputs);
+            }
+        }
+        public void moveCameraSlightly()
+        {
+            List<Actions> inputs = new List<Actions>();
+            while (running)
+            {
+                Random r = new Random();
+                int rx = r.Next(-50, 50);
+                int ry = r.Next(-25, 25);
+                inputs.Add(new MouseMove(rx, ry));
+                inputs.Add(new Wait(r.Next(500, 1000)));
+                inputs.Add(new MouseMove(-rx, -ry));
+                inputs.Add(new Wait(r.Next(5000, 10000)));
+                doActions(inputs);
+            }
+        }
+        public void moveCameraSquare()
+        {
+            List<Actions> inputs = new List<Actions>();
+            while (running)
+            {
+                Random r = new Random();
+                inputs.Add(new MouseMove(50, 0));
+                inputs.Add(new Wait(1000));
+                inputs.Add(new MouseMove(0, -50));
+                inputs.Add(new Wait(1000));
+                inputs.Add(new MouseMove(-50, 0));
+                inputs.Add(new Wait(1000));
+                inputs.Add(new MouseMove(0, 50));
+                inputs.Add(new Wait(r.Next(1000, 2000)));
+                doActions(inputs);
+            }
+        }
+        public void moveInSquare()
+        {
+            List<Actions> inputs = new List<Actions>();
+            while (running)
+            {
+                Random r = new Random();
+                inputs.Add(new InputWrapper('w'));
+                inputs.Add(new KeyWait(250));
+                inputs.Add(new InputWrapper('d'));
+                inputs.Add(new KeyWait(250));
+                inputs.Add(new InputWrapper('s'));
+                inputs.Add(new KeyWait(250));
+                inputs.Add(new InputWrapper('a'));
+                inputs.Add(new KeyWait(250));
+                inputs.Add(new Wait(r.Next(1000,2000)));
                 doActions(inputs);
             }
         }
