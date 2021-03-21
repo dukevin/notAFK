@@ -110,10 +110,13 @@ namespace notAFK
         {
             updateStatusLabel("Stopping...");
             endisableButtons(true, pause_btn);
-            curScript.clean();
-            curScript.running = false;
+            if(curScript != null)
+            {
+                curScript.clean();
+                curScript.running = false;
+                curScript = null;
+            }
             pause_btn.Enabled = false;
-            curScript = null;
             progressBar.SetState(3);
             updateStatusLabel("Stopped");
         }
