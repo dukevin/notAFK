@@ -110,7 +110,7 @@ namespace notAFK
                 int rx2 = 0;
                 int ry2 = 0;
                 inputs.Add(new MouseMove(rx, ry));
-                inputs.Add(new Wait(r.Next(0, 3000)));
+                inputs.Add(new Wait(r.Next(100, 3000)));
                 if (r.Next(1, 3) == 2)
                 {
                     rx2 = r.Next(-200, 200);
@@ -118,7 +118,7 @@ namespace notAFK
                     inputs.Add(new MouseMove(rx2, ry2));
                 }
                 inputs.Add(new MouseMove(-(rx+rx2), -(ry+ry2)));
-                inputs.Add(new Wait(r.Next(0, 3000)));
+                inputs.Add(new Wait(r.Next(1000, 3000)));
                 doActions(inputs);
             }
         }
