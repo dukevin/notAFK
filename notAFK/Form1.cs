@@ -88,14 +88,7 @@ namespace notAFK
             wheel_btn.Enabled = endis;
             rowboat_btn.Enabled = endis;
             land_btn.Enabled = endis;
-            if (except != null)
-            {
-                if(!endis)
-                    except.Enabled = true;
-                else
-                    except.Enabled = false;
-            }
-                
+            except.Enabled = !endis;               
         }
         private void rowboat_btn_Click(object sender, EventArgs e)
         {
